@@ -1,0 +1,1767 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEP AI</title>
+<script>
+    // Firebase authentication code yahan nahi,
+    // neeche alag module script mein add hoga.
+</script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #212121;
+            color: white;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #171717;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .new-chat {
+            background: #303030;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .new-chat:hover {
+            background: #404040;
+        }
+
+        .history-title {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        #historyList {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .history-open {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: left;
+            padding: 10px;
+            color: #ddd;
+            background: transparent;
+            border: none;
+            border-radius: 7px;
+        }
+
+        .history-open:hover {
+            background: #303030;
+        }
+
+        .delete-chat {
+            background: transparent;
+            border: none;
+            color: #999;
+            padding: 6px;
+        }
+
+        .delete-chat:hover {
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .topbar {
+            padding: 18px 22px;
+            border-bottom: 1px solid #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome {
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            color: #aaa;
+        }
+
+        .message {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 18px;
+            border-radius: 14px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .message.user {
+            background: #303030;
+        }
+
+        .message.bot {
+            background: #262626;
+        }
+
+        .message-content {
+            display: block;
+        }
+
+        .copy-btn {
+            margin-top: 12px;
+            padding: 7px 11px;
+            color: #ddd;
+            background: transparent;
+            border: 1px solid #555;
+            border-radius: 7px;
+            font-size: 13px;
+        }
+
+        .copy-btn:hover {
+            background: #404040;
+        }
+
+        .input-area {
+            padding: 15px 20px 20px;
+        }
+
+        .input-box {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: #303030;
+            border: 1px solid #555;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        #userInput {
+            flex: 1;
+            min-width: 0;
+            max-height: 150px;
+            resize: vertical;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            padding: 8px;
+        }
+
+        #userInput::placeholder {
+            color: #aaa;
+        }
+
+        #sendBtn {
+            background: white;
+            color: #111;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        #sendBtn:hover {
+            background: #ddd;
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 125px;
+                padding: 10px;
+            }
+
+            .logo {
+                font-size: 17px;
+            }
+
+            .new-chat {
+                font-size: 12px;
+                padding: 9px;
+            }
+
+            .topbar {
+                padding: 15px;
+            }
+
+            #chat {
+                padding: 15px 8px;
+            }
+
+            .message {
+                padding: 12px;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            #sendBtn {
+                padding: 10px;
+            }
+        }
+      
+/* Modern ChatGPT-style polish */
+:root {
+  color-scheme: dark;
+  --app-bg: #212121;
+  --sidebar-bg: #171717;
+  --panel-bg: #2f2f2f;
+  --border-color: #414141;
+  --text-main: #f5f5f5;
+  --text-muted: #a1a1a1;
+  --accent: #ffffff;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               sans-serif;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  filter: brightness(1.12);
+}
+
+textarea,
+input {
+  color: var(--text-main);
+}
+
+::selection {
+  background: #555;
+  color: #fff;
+}
+
+/* Cleaner sidebar */
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid #303030;
+}
+
+/* Chat area */
+.chat-container,
+.chat-area,
+.main-content {
+  background: var(--app-bg);
+}
+
+/* Message readability */
+.message,
+.user-message,
+.bot-message {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.user-message {
+  border-radius: 22px;
+}
+
+.bot-message {
+  border-radius: 16px;
+}
+
+/* Modern message composer */
+textarea {
+  outline: none;
+  resize: vertical;
+}
+
+textarea:focus,
+input:focus {
+  border-color: #666;
+}
+
+/* Smooth scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+/* Mobile-friendly layout */
+@media (max-width: 700px) {
+  .sidebar {
+    width: min(280px, 82vw);
+  }
+
+  .main-content,
+  .chat-area,
+  .chat-container {
+    min-width: 0;
+  }
+
+  textarea {
+    max-width: 100%;
+  }
+}
+  
+/* ===== PROFESSIONAL CHATGPT-STYLE DESIGN ===== */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 sans-serif;
+    background: #212121;
+    color: #ececec;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: #171717;
+    border-right: 1px solid #303030;
+    padding: 18px 14px;
+    gap: 18px;
+}
+
+.logo {
+    font-size: 21px;
+    letter-spacing: -0.5px;
+    padding: 5px 7px;
+}
+
+.new-chat {
+    background: transparent;
+    border: 1px solid #454545;
+    border-radius: 12px;
+    padding: 13px;
+    transition: background 0.2s ease;
+}
+
+.new-chat:hover {
+    background: #292929;
+}
+
+/* Top bar */
+.topbar {
+    background: #212121;
+    border-bottom: 1px solid #303030;
+    padding: 17px 24px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Chat messages */
+#chat {
+    padding: 32px 22px;
+    gap: 24px;
+    scroll-behavior: smooth;
+}
+
+.message {
+    max-width: 780px;
+    padding: 15px 19px;
+    border-radius: 18px;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.message.user {
+    background: #303030;
+    border: 1px solid #3b3b3b;
+    width: fit-content;
+    max-width: min(780px, 90%);
+    margin-right: max(0px, calc((100% - 780px) / 2));
+}
+
+.message.bot {
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+}
+
+/* Welcome screen */
+.welcome h1 {
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 600;
+    letter-spacing: -0.8px;
+    margin-bottom: 14px;
+}
+
+.welcome p {
+    color: #a1a1a1;
+    font-size: 15px;
+}
+
+/* Input area */
+.input-area {
+    padding: 16px 22px 22px;
+    background: #212121;
+}
+
+.input-box {
+    max-width: 800px;
+    border: 1px solid #484848;
+    background: #2f2f2f;
+    border-radius: 24px;
+    padding: 12px 14px;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transition: border-color 0.2s ease;
+}
+
+.input-box:focus-within {
+    border-color: #686868;
+}
+
+#userInput {
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 9px;
+}
+
+#userInput::placeholder {
+    color: #a0a0a0;
+}
+
+/* Send button */
+#sendBtn {
+    border-radius: 50px;
+    padding: 11px 16px;
+    background: #f4f4f4;
+    color: #171717;
+    font-weight: 600;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+#sendBtn:hover {
+    background: #dedede;
+    transform: translateY(-1px);
+}
+
+/* Microphone button */
+#voiceBtn {
+    border: none;
+    border-radius: 50%;
+    min-width: 42px;
+    min-height: 42px;
+    background: #414141;
+    color: white;
+    font-size: 18px;
+}
+
+#voiceBtn:hover {
+    background: #505050;
+}
+
+/* Copy button */
+.copy-btn {
+    border-color: #454545;
+    border-radius: 9px;
+    transition: background 0.2s ease;
+}
+
+.copy-btn:hover {
+    background: #333333;
+}
+
+/* Chat history */
+.history-open {
+    border-radius: 9px;
+    padding: 11px;
+    font-size: 14px;
+}
+
+.delete-chat {
+    border-radius: 7px;
+}
+
+.delete-chat:hover {
+    background: #303030;
+}
+
+/* Scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+}
+
+/* Mobile layout */
+@media (max-width: 600px) {
+    .sidebar {
+        width: 180px;
+        min-width: 0;
+        padding: 10px;
+    }
+
+    .logo {
+        font-size: 17px;
+    }
+
+    .new-chat {
+        font-size: 13px;
+    }
+
+    .topbar {
+        padding: 15px;
+    }
+
+    #chat {
+        padding: 20px 12px;
+        gap: 18px;
+    }
+
+    .message {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .input-area {
+        padding: 10px;
+    }
+
+    .input-box {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    #userInput {
+        font-size: 14px;
+    }
+
+    #sendBtn {
+        padding: 10px;
+    }
+}
+
+/* Welcome prompt cards */
+.prompt-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    width: 100%;
+    max-width: 1000px;
+    box-sizing: border-box;
+    margin: 30px auto 0;
+}
+.prompt-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px 16px;
+    text-align: left;
+    color: #ececec;
+    background: #292929;
+    border: 1px solid #414141;
+    border-radius: 16px;
+    transition: background 0.2s, border-color 0.2s,
+                transform 0.2s;
+}
+
+.prompt-card:hover {
+    background: #333333;
+    border-color: #686868;
+    transform: translateY(-2px);
+}
+
+.prompt-icon {
+    font-size: 23px;
+}
+
+.prompt-card strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.prompt-description {
+    color: #a7a7a7;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.history-open {
+    transition: background 0.2s, color 0.2s;
+}
+
+.history-open:hover {
+    background: #303030;
+    color: #ffffff;
+}
+
+.input-box {
+    border-radius: 26px;
+    background: #303030;
+    border-color: #484848;
+}
+
+#userInput {
+    resize: none;
+    overflow-y: auto;
+    min-height: 42px;
+}
+
+
+
+@media (max-width: 800px) {
+    .prompt-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 100%;
+        gap: 8px;
+        margin-top: 22px;
+    }
+
+    .prompt-card {
+        padding: 12px 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .prompt-card strong {
+        font-size: 12px;
+    }
+
+    .prompt-description {
+        font-size: 11px;
+    }
+}
+
+
+@media (min-width: 801px) {
+    .prompt-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Deep Chat AI — Dark Navy Gradient Background */
+
+html,
+body {
+    min-height: 100%;
+    background: #0b1020;
+    color: #f5f6ff;
+}
+
+body {
+    background:
+        radial-gradient(
+            ellipse at 50% 35%,
+            rgba(53, 48, 130, 0.24),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            #0b0d1d 0%,
+            #11152b 48%,
+            #0b1930 100%
+        ) !important;
+}
+
+/* Left Sidebar */
+.sidebar {
+    background: rgba(8, 12, 27, 0.98) !important;
+    border-right: 1px solid rgba(140, 150, 255, 0.15);
+}
+
+/* Main Chat Background */
+.main {
+    background: transparent !important;
+}
+
+/* Top Header */
+.topbar {
+    background: rgba(30, 30, 30, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Chat Messages Area */
+#chat {
+    background: transparent !important;
+}
+
+/* Welcome Heading */
+.welcome h1 {
+    color: #f5f6ff;
+}
+
+/* Welcome Description */
+.welcome p {
+    color: #a7acc0;
+}
+
+/* Suggestion Cards */
+.prompt-card {
+    background: linear-gradient(
+        145deg,
+        rgba(35, 43, 78, 0.85),
+        rgba(18, 23, 46, 0.94)
+    ) !important;
+    color: #f5f6ff;
+    border: 1px solid rgba(140, 150, 255, 0.22);
+    border-radius: 20px;
+    transition: 0.25s ease;
+}
+
+.prompt-card:hover {
+    border-color: rgba(135, 120, 255, 0.8);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(79, 70, 229, 0.16);
+}
+
+/* Bottom Input Area */
+.input-area {
+    background: #202020;
+}
+
+/* Message Input */
+.input-box {
+    background: rgba(35, 37, 48, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+}
+
+/* Text Box */
+#userInput {
+    background: #151a30;
+    color: #ffffff;
+    border: 1px solid rgba(100, 120, 255, 0.35);
+    border-radius: 22px;
+}
+
+#userInput:focus {
+    border-color: #8175ff;
+    outline: none;
+}
+
+/* Microphone Button */
+#voiceBtn {
+    background: #414141;
+    color: white;
+    border-radius: 50%;
+}
+
+/* Smooth Scrolling */
+#chat {
+    scroll-behavior: smooth;
+}
+
+aiMessage.innerHTML = `
+  <span class="typing-indicator">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+`;
+
+/* User chat bubble */
+.user-message {
+  display: block;
+  width: fit-content;
+  max-width: 75%;
+  margin: 12px 0 12px auto;
+  padding: 12px 18px;
+  border-radius: 20px 20px 5px 20px;
+  background: linear-gradient(135deg, #635bff, #8b5cf6);
+  color: #ffffff;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  animation: bubblePop 0.25s ease-out;
+}
+
+@keyframes bubblePop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Deep AI chat bubbles */
+.message {
+  display: block;
+  width: fit-content;
+  max-width: 78%;
+  padding: 12px 17px;
+  margin: 14px 0;
+  border-radius: 19px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  animation: bubblePop 0.28s ease-out;
+}
+
+/* Your message - right side */
+.message.user {
+  margin-left: auto;
+  background: linear-gradient(135deg, #635bff, #8b5cf6);
+  color: #fff;
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 4px 18px rgba(99, 91, 255, 0.18);
+}
+
+/* Deep AI reply - left side */
+.message.bot {
+  margin-right: auto;
+  background: #1c2233;
+  color: #f1f5f9;
+  border: 1px solid #30384d;
+  border-bottom-left-radius: 5px;
+}
+
+/* Smooth appearance */
+@keyframes bubblePop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Account and login design */
+.account-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.account-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.account-actions button,
+.auth-button {
+    background: #5145e5;
+    color: white;
+    border: 1px solid #7770ff;
+    border-radius: 10px;
+    padding: 9px 13px;
+}
+
+#accountStatus {
+    color: #b9bce0;
+    font-size: 12px;
+}
+
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, .75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+.auth-overlay[hidden],
+.account-actions [hidden] {
+    display: none !important;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: #151a30;
+    border: 1px solid #444b70;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 20px 70px #0008;
+}
+
+.auth-card h2 {
+    margin-bottom: 8px;
+}
+
+.auth-subtitle,
+#authMessage {
+    color: #b8bfd8;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+.auth-card input {
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 12px;
+    background: #222942;
+    border: 1px solid #454e70;
+    border-radius: 10px;
+    color: white;
+}
+
+.auth-card button {
+    width: 100%;
+    margin-top: 9px;
+    padding: 11px;
+    border-radius: 10px;
+    border: 1px solid #555e84;
+    background: #292f49;
+    color: white;
+}
+
+.auth-card .primary-auth {
+    background: #6258ed;
+}
+
+.auth-card .close-auth {
+    background: transparent;
+}
+
+.auth-card button:disabled {
+    opacity: .6;
+}
+
+#profileDetails {
+    overflow-wrap: anywhere;
+    line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+    .account-topbar {
+        padding: 12px;
+        flex-wrap: wrap;
+    }
+
+    .account-actions {
+        gap: 5px;
+    }
+
+    .account-actions button {
+        padding: 7px;
+        font-size: 12px;
+    }
+}
+
+/* Premium Deep AI voice controls */
+.voice-control-btn {
+    background: #171923;
+    color: #f3f4f6;
+    border: 1px solid #343849;
+    border-radius: 12px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.voice-control-btn:hover {
+    background: #292e40;
+    border-color: #8b5cf6;
+}
+
+.voice-control-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.voice-speaking {
+    color: #a78bfa;
+    animation: voicePulse 1s infinite alternate;
+}
+
+@keyframes voicePulse {
+    from { opacity: 0.65; }
+    to { opacity: 1; }
+}
+
+    </style>
+</head>
+
+<script>
+(function () {
+    if (document.getElementById("stopVoiceBtn")) return;
+
+    const button = document.createElement("button");
+    button.id = "stopVoiceBtn";
+    button.className = "voice-control-btn";
+    button.textContent = "⏹ Stop Voice";
+    button.type = "button";
+    button.style.position = "fixed";
+    button.style.bottom = "90px";
+    button.style.right = "20px";
+    button.style.zIndex = "9999";
+
+    button.addEventListener("click", function () {
+        window.speechSynthesis.cancel();
+        button.classList.remove("voice-speaking");
+    });
+
+    document.body.appendChild(button);
+
+    window.addEventListener("beforeunload", function () {
+        window.speechSynthesis.cancel();
+    });
+})();
+</script>
+
+<body>
+
+    <aside class="sidebar">
+      <div class="logo">✨ DEEP AI</div>
+
+        <button class="new-chat" id="newChatBtn">
+            + New Chat
+        </button>
+
+        <div class="history-title">CHAT HISTORY</div>
+        <div id="historyList"></div>
+    </aside>
+
+    <main class="main">
+       <div class="topbar account-topbar">
+    <span>✨ DEEP AI</span>
+    <div class="account-actions">
+        <span id="accountStatus">Guest mode</span>
+        <button id="loginOpenBtn" onclick="openAuthModal()">Login</button>
+        <button id="profileBtn" onclick="showProfile()" hidden>My Profile</button>
+        <button id="logoutBtn" onclick="logoutUser()" hidden>Logout</button>
+    </div>
+</div>
+
+        <div id="chat">
+            <div class="welcome" id="welcome">
+                <h1>How can I help you? ✨</h1>
+                <p>Ask me anything and let's get started.</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-box">
+                <textarea
+                    id="userInput"
+                    rows="1"
+                    placeholder="Talk to Deep AI......"
+                ></textarea>
+
+                <button id="sendBtn">Send ↑</button>
+
+<button id="voiceBtn" onclick="startVoice()">🎤</button>
+
+            </div>
+
+            <div class="footer">
+                My  DEEP AI can make mistakes. Check important information.
+            </div>
+        </div>
+    </main>
+
+<!-- Login modal -->
+<div class="auth-overlay" id="authModal" hidden>
+    <div class="auth-card">
+        <h2 id="authTitle">Welcome to Deep AI</h2>
+
+        <p class="auth-subtitle">
+            Sign in to your account, or continue as a guest.
+        </p>
+
+        <form id="authForm">
+            <input id="authName" type="text"
+                placeholder="Your name (for sign up)"
+                autocomplete="name" hidden>
+
+            <input id="authEmail" type="email"
+                placeholder="Email address"
+                autocomplete="email" required>
+
+            <input id="authPassword" type="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                minlength="6" required>
+
+            <button class="primary-auth" id="emailSubmitBtn"
+                type="submit">Login</button>
+        </form>
+
+        <button type="button" id="googleLoginBtn"
+            onclick="googleLogin()">Continue with Google</button>
+
+        <button type="button" id="authModeBtn"
+            onclick="toggleAuthMode()">Create an account</button>
+
+        <button type="button" id="forgotPasswordBtn"
+            onclick="resetPassword()">Forgot password?</button>
+
+        <p id="authMessage" role="status" aria-live="polite"></p>
+
+        <button type="button" class="close-auth"
+            onclick="closeAuthModal()">
+            Close — continue as guest
+        </button>
+    </div>
+</div>
+
+<!-- Profile modal -->
+<div class="auth-overlay" id="profileModal" hidden>
+    <div class="auth-card">
+        <h2>My Profile</h2>
+        <p id="profileDetails">Loading profile...</p>
+        <button type="button" class="close-auth"
+            onclick="closeProfile()">Close</button>
+    </div>
+</div>
+
+    <script>
+        const chat = document.getElementById("chat");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const newChatBtn = document.getElementById("newChatBtn");
+        const historyList = document.getElementById("historyList");
+
+        let chats = [];
+        let currentChatId = null;
+        let isSending = false;
+
+        try {
+            chats = JSON.parse(localStorage.getItem("myAIChats")) || [];
+            if (!Array.isArray(chats)) chats = [];
+        } catch (error) {
+            chats = [];
+        }
+
+        function saveChats() {
+            localStorage.setItem("myAIChats", JSON.stringify(chats));
+        }
+
+        function createNewChat() {
+            currentChatId = Date.now().toString();
+
+            chats.unshift({
+                id: currentChatId,
+                title: "New Chat",
+                messages: []
+            });
+
+            saveChats();
+            renderChat();
+            renderHistory();
+            userInput.focus();
+        }
+
+        function renderChat() {
+            chat.innerHTML = "";
+
+            const current = chats.find(item => item.id === currentChatId);
+
+            if (!current || current.messages.length === 0) {
+                const welcome = document.createElement("div");
+                welcome.className = "welcome";
+
+                const heading = document.createElement("h1");
+                heading.textContent = "How can I help you? ✨";
+
+                const paragraph = document.createElement("p");
+                paragraph.textContent = "Ask me anything and let's get started.";
+
+                welcome.appendChild(heading);
+                welcome.appendChild(paragraph);
+
+const suggestions = document.createElement("div");
+suggestions.className = "prompt-cards";
+
+const prompts = [
+    {
+        icon: "💻",
+        title: "Learn programming",
+        text: "Teach me programming from beginner level."
+    },
+    {
+        icon: "⌨️",
+        title: "Write code",
+        text: "Write a simple Python program and explain it."
+    },
+    {
+        icon: "📚",
+        title: "Explain a topic",
+        text: "Explain artificial intelligence in simple words."
+    }
+];
+
+prompts.forEach(prompt => {
+    const card = document.createElement("button");
+    card.className = "prompt-card";
+
+    const icon = document.createElement("span");
+    icon.className = "prompt-icon";
+    icon.textContent = prompt.icon;
+
+    const title = document.createElement("strong");
+    title.textContent = prompt.title;
+
+    const description = document.createElement("span");
+    description.className = "prompt-description";
+    description.textContent = prompt.text;
+
+    card.append(icon, title, description);
+
+    card.addEventListener("click", () => {
+        userInput.value = prompt.text;
+        userInput.dispatchEvent(new Event("input"));
+        userInput.focus();
+    });
+
+    suggestions.appendChild(card);
+});
+
+welcome.appendChild(suggestions);
+
+                chat.appendChild(welcome);
+                return;
+            }
+
+            current.messages.forEach(message => {
+                addMessage(message.text, message.type);
+            });
+
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement("div");
+            div.className = "message " + type;
+
+            const content = document.createElement("span");
+            content.className = "message-content";
+            content.textContent = text;
+            div.appendChild(content);
+
+            if (type === "bot" && text !== "Thinking...") {
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "copy-btn";
+                copyBtn.textContent = "📋 Copy";
+
+                copyBtn.addEventListener("click", async function () {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        copyBtn.textContent = "✅ Copied!";
+                    } catch (error) {
+                        const temp = document.createElement("textarea");
+                        temp.value = text;
+                        document.body.appendChild(temp);
+                        temp.select();
+
+                        try {
+                            document.execCommand("copy");
+                            copyBtn.textContent = "✅ Copied!";
+                        } catch (copyError) {
+                            copyBtn.textContent = "Please copy manually";
+                        }
+
+                        temp.remove();
+                    }
+                });
+
+                div.appendChild(copyBtn);
+            }
+
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+
+            return div;
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = "";
+
+            chats.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "history-item";
+
+                const openBtn = document.createElement("button");
+                openBtn.className = "history-open";
+                openBtn.textContent = item.title || "New Chat";
+                openBtn.title = item.title || "New Chat";
+
+                if (item.id === currentChatId) {
+                    openBtn.style.background = "#303030";
+                }
+
+                openBtn.addEventListener("click", function () {
+                    currentChatId = item.id;
+                    renderChat();
+                    renderHistory();
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-chat";
+                deleteBtn.textContent = "✕";
+                deleteBtn.title = "Delete chat";
+
+                deleteBtn.addEventListener("click", function () {
+                    chats = chats.filter(chatItem => chatItem.id !== item.id);
+
+                    if (currentChatId === item.id) {
+                        currentChatId = chats.length ? chats[0].id : null;
+                    }
+
+                    saveChats();
+
+                    if (!currentChatId) {
+                        createNewChat();
+                    } else {
+                        renderChat();
+                        renderHistory();
+                    }
+                });
+
+                row.appendChild(openBtn);
+                row.appendChild(deleteBtn);
+                historyList.appendChild(row);
+            });
+        }
+
+function startVoice() {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Voice recognition ke liye Chrome browser use karo.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "hi-IN";
+    recognition.interimResults = false;
+
+    recognition.onstart = function () {
+        document.getElementById("voiceBtn").textContent = "🎙️";
+    };
+
+    recognition.onresult = function (event) {
+        userInput.value = event.results[0][0].transcript;
+        sendMessage();
+    };
+
+    recognition.onerror = function () {
+        alert("Microphone check karo aur Chrome ko permission do.");
+    };
+
+    recognition.onend = function () {
+        document.getElementById("voiceBtn").textContent = "🎤";
+    };
+
+    recognition.start();
+}
+
+        async function sendMessage() {
+
+            const message = userInput.value.trim();
+
+            if (!message || isSending) return;
+
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            let current = chats.find(item => item.id === currentChatId);
+
+            if (!current) {
+                createNewChat();
+                current = chats.find(item => item.id === currentChatId);
+            }
+
+            if (!current) return;
+
+            isSending = true;
+            sendBtn.disabled = true;
+            sendBtn.textContent = "Wait...";
+
+            current.messages.push({
+                type: "user",
+                text: message
+            });
+
+            if (current.title === "New Chat") {
+                current.title = message.length > 25
+                    ? message.substring(0, 25) + "..."
+                    : message;
+            }
+
+            userInput.value = "";
+            saveChats();
+            renderChat();
+            renderHistory();
+
+            addMessage("Thinking...", "bot");
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || data.reply || "Server error");
+                }
+
+                const reply =
+                    data.reply ??
+                    data.response ??
+                    data.answer ??
+                    data.text;
+
+                if (typeof reply !== "string") {
+                    throw new Error("Server response mein reply nahi mila.");
+                }
+
+// Save this chat to Firebase for logged-in users
+const user = auth.currentUser;
+
+if (user) {
+    await saveChatToFirebase(
+        user.uid,
+        message,
+        reply
+    );
+}
+
+
+
+const voiceReply = new SpeechSynthesisUtterance(reply);
+
+voiceReply.lang = /[\u0900-\u097F]/.test(reply)
+    ? "hi-IN"
+    : "en-IN";
+
+voiceReply.rate = 0.95;
+voiceReply.pitch = 1;
+voiceReply.volume = 1;
+
+window.speechSynthesis.cancel();
+window.speechSynthesis.speak(voiceReply);
+
+ 
+                current = chats.find(item => item.id === currentChatId);
+
+                if (current) {
+                    current.messages.push({
+                        type: "bot",
+                        text: reply
+                    });
+
+                    saveChats();
+                    renderChat();
+                    renderHistory();
+                }
+
+            } catch (error) {
+                const errorMessage =
+                    "Error: " + error.message +
+                    "\n\nCheck karo ki server.js chal raha hai aur /chat API sahi hai.";
+
+                current = chats.find(item => item.id === currentChatId);
+
+                if (current) {
+                    current.messages.push({
+                        type: "bot",
+                        text: errorMessage
+                    });
+
+                    saveChats();
+                    renderChat();
+                }
+
+                console.error("Chat error:", error);
+
+            } finally {
+                isSending = false;
+                sendBtn.disabled = false;
+                sendBtn.textContent = "Send ↑";
+                userInput.focus();
+            }
+        }
+
+        sendBtn.addEventListener("click", sendMessage);
+
+       
+sendBtn.addEventListener("click", sendMessage);
+
+userInput.addEventListener("input", function () {
+    userInput.style.height = "auto";
+
+    const maxHeight = 180;
+    userInput.style.height =
+        Math.min(userInput.scrollHeight, maxHeight) + "px";
+});
+
+userInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
+        if (chats.length > 0) {
+            currentChatId = chats[0].id;
+        } else {
+            createNewChat();
+        }
+
+        renderChat();
+        renderHistory();
+    </script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+// Apni Firebase Console wali API key yahan khud paste karo
+const firebaseConfig = {
+  apiKey: "AIzaSyDLV6X8Mq8nGUL2rqfxBiyMQ07UfR7-0tU",
+  authDomain: "deep-ai-94d07.firebaseapp.com",
+  projectId: "deep-ai-94d07",
+  storageBucket: "deep-ai-94d07.firebasestorage.app",
+  messagingSenderId: "1019577763811",
+  appId: "1:1019577763811:web:49441ef8e94ef7e04342d6",
+  measurementId: "G-NFZ0G5BHSV"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+window.auth = auth;
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+let isSignup = false;
+
+function showMessage(message) {
+  const el = document.getElementById("authMessage");
+  if (el) el.textContent = message;
+}
+
+window.openAuthModal = function () {
+  document.getElementById("authModal").hidden = false;
+  showMessage("");
+};
+
+window.closeAuthModal = function () {
+  document.getElementById("authModal").hidden = true;
+};
+
+window.toggleAuthMode = function () {
+  isSignup = !isSignup;
+  document.getElementById("authTitle").textContent =
+    isSignup ? "Create your Deep AI account" : "Welcome to Deep AI";
+  document.getElementById("authName").hidden = !isSignup;
+  document.getElementById("authName").required = isSignup;
+  document.getElementById("authPassword").autocomplete =
+    isSignup ? "new-password" : "current-password";
+  document.getElementById("emailSubmitBtn").textContent =
+    isSignup ? "Create Account" : "Login";
+  document.getElementById("authModeBtn").textContent =
+    isSignup ? "Already have an account? Login" : "Create an account";
+  document.getElementById("forgotPasswordBtn").hidden = isSignup;
+  showMessage("");
+};
+
+document.getElementById("authForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const name = document.getElementById("authName").value.trim();
+
+  try {
+    if (isSignup) {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      if (name) await updateProfile(result.user, { displayName: name });
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+
+    closeAuthModal();
+    showMessage("");
+  } catch (error) {
+    showMessage(error.message);
+  }
+});
+
+window.googleLogin = async function () {
+  try {
+    await signInWithPopup(auth, googleProvider);
+    closeAuthModal();
+  } catch (error) {
+    showMessage(error.message);
+  }
+};
+
+window.resetPassword = async function () {
+  const email = document.getElementById("authEmail").value.trim();
+
+  if (!email) {
+    showMessage("Pehle apna email address enter karo.");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showMessage("Password reset email bhej diya gaya hai. Inbox check karo.");
+  } catch (error) {
+    showMessage(error.message);
+  }
+};
+
+window.showProfile = function () {
+  const user = window.auth?.currentUser;
+  if (!user) return;
+
+  document.getElementById("profileDetails").textContent =
+    `Name: ${user.displayName || "Not set"} | Email: ${user.email || "Not available"}`;
+
+  document.getElementById("profileModal").hidden = false;
+};
+
+window.closeProfile = function () {
+  document.getElementById("profileModal").hidden = true;
+};
+
+window.logoutUser = async function () {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    alert(error.message);
+  }
+};
+// Save a chat to the logged-in user's Firestore account
+async function saveChatToFirebase(userId, message, reply) {
+  try {
+    await addDoc(collection(db, "users", userId, "chats"), {
+      message: message,
+      reply: reply,
+      createdAt: serverTimestamp()
+    });
+    console.log("Chat saved to Firebase");
+  } catch (error) {
+    console.error("Firebase chat save error:", error);
+  }
+}
+onAuthStateChanged(auth, (user) => {
+  document.getElementById("accountStatus").textContent =
+    user ? `Hi, ${user.displayName || user.email}` : "Guest mode";
+
+  document.getElementById("loginOpenBtn").hidden = !!user;
+  document.getElementById("profileBtn").hidden = !user;
+  document.getElementById("logoutBtn").hidden = !user;
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My AI Chatbot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #212121;
+            color: white;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #171717;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .new-chat {
+            background: #303030;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .new-chat:hover {
+            background: #404040;
+        }
+
+        .history-title {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        #historyList {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .history-open {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: left;
+            padding: 10px;
+            color: #ddd;
+            background: transparent;
+            border: none;
+            border-radius: 7px;
+        }
+
+        .history-open:hover {
+            background: #303030;
+        }
+
+        .delete-chat {
+            background: transparent;
+            border: none;
+            color: #999;
+            padding: 6px;
+        }
+
+        .delete-chat:hover {
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .topbar {
+            padding: 18px 22px;
+            border-bottom: 1px solid #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome {
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            color: #aaa;
+        }
+
+        .message {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 18px;
+            border-radius: 14px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .message.user {
+            background: #303030;
+        }
+
+        .message.bot {
+            background: #262626;
+        }
+
+        .message-content {
+            display: block;
+        }
+
+        .copy-btn {
+            margin-top: 12px;
+            padding: 7px 11px;
+            color: #ddd;
+            background: transparent;
+            border: 1px solid #555;
+            border-radius: 7px;
+            font-size: 13px;
+        }
+
+        .copy-btn:hover {
+            background: #404040;
+        }
+
+        .input-area {
+            padding: 15px 20px 20px;
+        }
+
+        .input-box {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: #303030;
+            border: 1px solid #555;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        #userInput {
+            flex: 1;
+            min-width: 0;
+            max-height: 150px;
+            resize: vertical;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            padding: 8px;
+        }
+
+        #userInput::placeholder {
+            color: #aaa;
+        }
+
+        #sendBtn {
+            background: white;
+            color: #111;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        #sendBtn:hover {
+            background: #ddd;
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 125px;
+                padding: 10px;
+            }
+
+            .logo {
+                font-size: 17px;
+            }
+
+            .new-chat {
+                font-size: 12px;
+                padding: 9px;
+            }
+
+            .topbar {
+                padding: 15px;
+            }
+
+            #chat {
+                padding: 15px 8px;
+            }
+
+            .message {
+                padding: 12px;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            #sendBtn {
+                padding: 10px;
+            }
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">🤖 My AI</div>
+
+        <button class="new-chat" id="newChatBtn">
+            + New Chat
+        </button>
+
+        <div class="history-title">CHAT HISTORY</div>
+        <div id="historyList"></div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">My AI Chatbot</div>
+
+        <div id="chat">
+            <div class="welcome" id="welcome">
+                <h1>How can I help you? ✨</h1>
+                <p>Ask me anything and let's get started.</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-box">
+                <textarea
+                    id="userInput"
+                    rows="1"
+                    placeholder="Message My AI..."
+                ></textarea>
+
+                <button id="sendBtn">Send ↑</button>
+
+<button id="voiceBtn" onclick="startVoice()">🎤</button>
+
+            </div>
+
+            <div class="footer">
+                My AI can make mistakes. Check important information.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const chat = document.getElementById("chat");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const newChatBtn = document.getElementById("newChatBtn");
+        const historyList = document.getElementById("historyList");
+
+        let chats = [];
+        let currentChatId = null;
+        let isSending = false;
+
+        try {
+            chats = JSON.parse(localStorage.getItem("myAIChats")) || [];
+            if (!Array.isArray(chats)) chats = [];
+        } catch (error) {
+            chats = [];
+        }
+
+        function saveChats() {
+            localStorage.setItem("myAIChats", JSON.stringify(chats));
+        }
+
+        function createNewChat() {
+            currentChatId = Date.now().toString();
+
+            chats.unshift({
+                id: currentChatId,
+                title: "New Chat",
+                messages: []
+            });
+
+            saveChats();
+            renderChat();
+            renderHistory();
+            userInput.focus();
+        }
+
+        function renderChat() {
+            chat.innerHTML = "";
+
+            const current = chats.find(item => item.id === currentChatId);
+
+            if (!current || current.messages.length === 0) {
+                const welcome = document.createElement("div");
+                welcome.className = "welcome";
+
+                const heading = document.createElement("h1");
+                heading.textContent = "How can I help you? ✨";
+
+                const paragraph = document.createElement("p");
+                paragraph.textContent = "Ask me anything and let's get started.";
+
+                welcome.appendChild(heading);
+                welcome.appendChild(paragraph);
+                chat.appendChild(welcome);
+                return;
+            }
+
+            current.messages.forEach(message => {
+                addMessage(message.text, message.type);
+            });
+
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement("div");
+            div.className = "message " + type;
+
+            const content = document.createElement("span");
+            content.className = "message-content";
+            content.textContent = text;
+            div.appendChild(content);
+
+            if (type === "bot" && text !== "Thinking...") {
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "copy-btn";
+                copyBtn.textContent = "📋 Copy";
+
+                copyBtn.addEventListener("click", async function () {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        copyBtn.textContent = "✅ Copied!";
+                    } catch (error) {
+                        const temp = document.createElement("textarea");
+                        temp.value = text;
+                        document.body.appendChild(temp);
+                        temp.select();
+
+                        try {
+                            document.execCommand("copy");
+                            copyBtn.textContent = "✅ Copied!";
+                        } catch (copyError) {
+                            copyBtn.textContent = "Please copy manually";
+                        }
+
+                        temp.remove();
+                    }
+                });
+
+                div.appendChild(copyBtn);
+            }
+
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+
+            return div;
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = "";
+
+            chats.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "history-item";
+
+                const openBtn = document.createElement("button");
+                openBtn.className = "history-open";
+                openBtn.textContent = item.title || "New Chat";
+                openBtn.title = item.title || "New Chat";
+
+                if (item.id === currentChatId) {
+                    openBtn.style.background = "#303030";
+                }
+
+                openBtn.addEventListener("click", function () {
+                    currentChatId = item.id;
+                    renderChat();
+                    renderHistory();
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-chat";
+                deleteBtn.textContent = "✕";
+                deleteBtn.title = "Delete chat";
+
+                deleteBtn.addEventListener("click", function () {
+                    chats = chats.filter(chatItem => chatItem.id !== item.id);
+
+                    if (currentChatId === item.id) {
+                        currentChatId = chats.length ? chats[0].id : null;
+                    }
+
+                    saveChats();
+
+                    if (!currentChatId) {
+                        createNewChat();
+                    } else {
+                        renderChat();
+                        renderHistory();
+                    }
+                });
+
+                row.appendChild(openBtn);
+                row.appendChild(deleteBtn);
+                historyList.appendChild(row);
+            });
+        }
+
+function startVoice() {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Voice recognition ke liye Chrome browser use karo.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "hi-IN";
+    recognition.interimResults = false;
+
+    recognition.onstart = function () {
+        document.getElementById("voiceBtn").textContent = "🎙️";
+    };
+
+    recognition.onresult = function (event) {
+        userInput.value = event.results[0][0].transcript;
+        sendMessage();
+    };
+
+    recognition.onerror = function () {
+        alert("Microphone check karo aur Chrome ko permission do.");
+    };
+
+    recognition.onend = function () {
+        document.getElementById("voiceBtn").textContent = "🎤";
+    };
+
+    recognition.start();
+}
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+
+            if (!message || isSending) return;
+
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            let current = chats.find(item => item.id === currentChatId);
+
+            if (!current) {
+                createNewChat();
+                current = chats.find(item => item.id === currentChatId);
+            }
+
+            if (!current) return;
+
+            isSending = true;
+            sendBtn.disabled = true;
+            sendBtn.textContent = "Wait...";
+
+            current.messages.push({
+                type: "user",
+                text: message
+            });
+
+            if (current.title === "New Chat") {
+                current.title = message.length > 25
+                    ? message.substring(0, 25) + "..."
+                    : message;
+            }
+
+            userInput.value = "";
+            saveChats();
+            renderChat();
+            renderHistory();
+
+            addMessage("Thinking...", "bot");
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || data.reply || "Server error");
+                }
+
+                const reply =
+                    data.reply ??
+                    data.response ??
+                    data.answer ??
+                    data.text;
+
+                if (typeof reply !== "string") {
+                    throw new Error("Server response mein reply nahi mila.");
+                }
+
+
+
+
+const voiceReply = new SpeechSynthesisUtterance(reply);
+
+voiceReply.lang = /[\u0900-\u097F]/.test(reply)
+    ? "hi-IN"
+    : "en-IN";
+
+voiceReply.rate = 0.9;
+voiceReply.pitch = 1;
+voiceReply.volume = 1;
+
+window.speechSynthesis.cancel();
+window.speechSynthesis.speak(voiceReply);
+
+
+ 
+                current = chats.find(item => item.id === currentChatId);
+
+                if (current) {
+                    current.messages.push({
+                        type: "bot",
+                        text: reply
+                    });
+
+                    saveChats();
+                    renderChat();
+                    renderHistory();
+                }
+
+            } catch (error) {
+                const errorMessage =
+                    "Error: " + error.message +
+                    "\n\nCheck karo ki server.js chal raha hai aur /chat API sahi hai.";
+
+                current = chats.find(item => item.id === currentChatId);
+
+                if (current) {
+                    current.messages.push({
+                        type: "bot",
+                        text: errorMessage
+                    });
+
+                    saveChats();
+                    renderChat();
+                }
+
+                console.error("Chat error:", error);
+
+            } finally {
+                isSending = false;
+                sendBtn.disabled = false;
+                sendBtn.textContent = "Send ↑";
+                userInput.focus();
+            }
+        }
+
+        sendBtn.addEventListener("click", sendMessage);
+
+        userInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        newChatBtn.addEventListener("click", createNewChat);
+
+        if (chats.length > 0) {
+            currentChatId = chats[0].id;
+        } else {
+            createNewChat();
+        }
+
+        renderChat();
+        renderHistory();
+    </script>
+
+</body>
+</html>
